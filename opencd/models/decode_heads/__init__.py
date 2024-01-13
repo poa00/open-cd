@@ -5,6 +5,7 @@ from .identity_head import DSIdentityHead, IdentityHead
 from .multi_head import MultiHeadDecoder
 from .sta_head import STAHead
 from .tiny_head import TinyHead
+from .mlpseg_head import MLPSegHead
 
 __all__ = ['BITHead', 'Changer', 'IdentityHead', 'DSIdentityHead', 'TinyHead',
-           'STAHead', 'MultiHeadDecoder', 'GeneralSCDHead']
+           'STAHead', 'MultiHeadDecoder', 'GeneralSCDHead', 'MLPSegHead']

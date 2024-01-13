@@ -1,13 +1,16 @@
 _base_ = '../_base_/default_runtime.py'
 
-dataset_type = 'WHU_CD_Dataset'
-data_root = 'data/WHU-CD-256'
+dataset_type = 'LEVIR_CD_Dataset'
+data_root = 'data/LEVIR-CD'
 
 crop_size = (256, 256)
 train_pipeline = [
     dict(type='MultiImgLoadImageFromFile'),
     dict(type='MultiImgLoadAnnotations'),
+    dict(type='MultiImgRandomRotate', prob=0.5, degree=180),
+    dict(type='MultiImgRandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='MultiImgRandomFlip', prob=0.5, direction='horizontal'),
+    dict(type='MultiImgRandomFlip', prob=0.5, direction='vertical'),
     # dict(type='MultiImgExchangeTime', prob=0.5),
     dict(
         type='MultiImgPhotoMetricDistortion',
@@ -19,7 +22,7 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(type='MultiImgLoadImageFromFile'),
-    dict(type='MultiImgResize', scale=(256, 256), keep_ratio=True),
+    dict(type='MultiImgResize', scale=(1024, 1024), keep_ratio=True),
     # add loading annotation after ``Resize`` because ground truth
     # does not need to do resize data transform
     dict(type='MultiImgLoadAnnotations'),
@@ -51,11 +54,10 @@ train_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='list/train.txt',
         data_prefix=dict(
-            img_path_from='A',
-            img_path_to='B',
-            seg_map_path='label'),
+            seg_map_path='train/label',
+            img_path_from='train/A', 
+            img_path_to='train/B'),
         pipeline=train_pipeline))
 val_dataloader = dict(
     batch_size=1,
@@ -65,11 +67,10 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='list/val.txt',
         data_prefix=dict(
-            img_path_from='A',
-            img_path_to='B',
-            seg_map_path='label'),
+            seg_map_path='val/label',
+            img_path_from='val/A',
+            img_path_to='val/B'),
         pipeline=test_pipeline))
 test_dataloader = dict(
     batch_size=1,
@@ -79,11 +80,10 @@ test_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='list/test.txt',
         data_prefix=dict(
-            img_path_from='A',
-            img_path_to='B',
-            seg_map_path='label'),
+            seg_map_path='test/label',
+            img_path_from='test/A',
+            img_path_to='test/B'),
         pipeline=test_pipeline))
 
 val_evaluator = dict(type='mmseg.IoUMetric', iou_metrics=['mFscore', 'mIoU'])
@@ -123,6 +123,6 @@ default_hooks = dict(
                     save_best='mIoU'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='CDVisualizationHook', interval=1, 
-                       img_shape=(256, 256, 3)))
+                       img_shape=(1024, 1024, 3)))
 
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)

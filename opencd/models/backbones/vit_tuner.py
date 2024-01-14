@@ -7,7 +7,7 @@ from opencd.registry import MODELS
 
 
 @MODELS.register_module()
-class MMPretrainSamVisionEncoder(BaseModule):
+class VisionTransformerTurner(BaseModule):
     def __init__(
         self,
         encoder_cfg,
